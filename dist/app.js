@@ -122,8 +122,13 @@ function gameView() {
 function render() {
   document.body.classList.toggle('light', data.settings.theme === 'light');
   app.innerHTML = `<div class="shell">${header()}${hero()}${screen === 'home' ? home() : gameView()}<footer class="bottom-note"><span>数字破译者 &nbsp; / &nbsp; 一场关于逻辑的游戏</span><span>THINK CLEARLY. GUESS WISELY.</span></footer></div><dialog id="dialog"></dialog>`;
-  if (screen === 'game' && game.mode === 'player' && game.status === 'playing')
-    $('#guess')?.focus();
+  if (screen === 'game' && game.mode === 'player' && game.status === 'playing') {
+    const field = $('#guess');
+    if (field) {
+      field.focus();
+      field.setSelectionRange(field.value.length, field.value.length);
+    }
+  }
 }
 function calculate(c, history, done) {
   busy = true;
@@ -213,23 +218,27 @@ function showStats(mode) {
   $('#record-body').innerHTML =
     `<div class="stats"><div class="stat">总局数<b>${rows.length}</b></div><div class="stat">胜率<b>${rows.length ? Math.round((wins.length / rows.length) * 100) + '%' : '—'}</b></div><div class="stat">胜利局数<b>${wins.length}</b></div><div class="stat">最少次数<b>${wins.length ? Math.min(...wins.map(x => x.guesses.length)) : '—'}</b></div><div class="stat">平均次数（胜局）<b>${avg}</b></div><div class="stat">最快通关<b>${wins.length ? time(Math.min(...wins.map(elapsed))) : '—'}</b></div></div><div class="scroll">${rows.length ? rows.map(x => `<details><summary>${new Date(x.endedAt).toLocaleString()} · ${x.status === 'won' ? '胜利' : x.status === 'lost' ? '失败' : '中止'} · ${x.guesses.length} 次 · ${time(elapsed(x))}</summary><p>谜底：${x.status === 'aborted' ? '未公开' : esc(x.secret || '未公开')} · ${x.usedAssist ? '使用辅助' : '未使用辅助'}</p>${x.guesses.map((h, i) => `<div>${i + 1}. ${h.guess} — ${h.matches} / 4</div>`).join('')}</details>`).join('') : '<p class="muted">还没有记录，开始第一场游戏吧。</p>'}</div>`;
 }
-app.addEventListener('input', e => {
-  if (e.target.id === 'guess') {
-    const field = e.target,
-      raw = field.value,
-      start = field.selectionStart ?? raw.length,
-      end = field.selectionEnd ?? start;
-    input = raw.replace(/\D/g, '').slice(0, 4);
-    const cleanPos = pos =>
-      Math.min(raw.slice(0, pos).replace(/\D/g, '').length, 4);
+function updateGuessInput(field, composing = false) {
+  const raw = field.value;
+  input = raw.replace(/\D/g, '').slice(0, 4);
+  if (!composing && raw !== input) {
+    const start = field.selectionStart ?? raw.length;
+    const end = field.selectionEnd ?? start;
+    const cleanPos = pos => Math.min(raw.slice(0, pos).replace(/\D/g, '').length, 4);
     field.value = input;
     field.setSelectionRange(cleanPos(start), cleanPos(end));
-    $('#input-wrap .digits').outerHTML = digits(input, 'entry');
   }
+  $('#input-wrap .digits').outerHTML = digits(input, 'entry');
+}
+app.addEventListener('input', e => {
+  if (e.target.id === 'guess') updateGuessInput(e.target, e.isComposing);
   if (e.target.id === 'notes') {
     game.notes = e.target.value;
     save();
   }
+});
+app.addEventListener('compositionend', e => {
+  if (e.target.id === 'guess') updateGuessInput(e.target);
 });
 app.addEventListener('change', e => {
   if (e.target.id === 'assist') {
