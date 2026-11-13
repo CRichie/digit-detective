@@ -117,7 +117,7 @@ function gameView() {
     limit =
       g.difficulty === 'challenge' ? 10 : g.difficulty === 'extreme' ? 7 : 0,
     c = filter(g.guesses);
-  return `<div class="grid"><section class="card main-card"><div class="card-top"><span class="label">CASE FILE &nbsp; / &nbsp; ${g.mode === 'player' ? '我来猜' : '电脑来猜'}</span><span class="tag">${playing ? '● 调查进行中' : g.status === 'won' ? '✓ 案件已破解' : g.status === 'lost' ? '案件未破解' : '已中止'}</span></div>${playing ? (g.mode === 'player' ? `<h2 class="main-title">输入你的猜测</h2><p class="sub">观察每条线索，找出隐藏的四位密码。</p><div class="input-wrap" id="input-wrap">${digits(input, 'entry')}<input class="digit-input" id="guess" inputmode="numeric" autocomplete="off" maxlength="4" value="${input}" aria-label="输入四位猜测数字"></div><div class="controls"><button class="primary" data-action="submit">提交猜测 &nbsp; →</button></div><p class="tip">输入四位数字，按 Enter 提交。数字可以重复。</p>` : `<h2 class="main-title">电脑的第 ${g.guesses.length + 1} 次猜测</h2><p class="sub">对照心中的数字，有几个位置完全正确？</p>${digits(g.current || '', 'secret')}<div class="feedback">${[0, 1, 2, 3, 4].map(n => `<button class="option" data-feedback="${n}" ${busy ? 'disabled' : ''}>${n}</button>`).join('')}</div><p class="tip">${busy ? '正在计算下一步，请稍候…' : '请选择位置命中数，数字相同但位置不同不计入。'}</p><p class="tip">剩余候选 ${c.length.toLocaleString()} · 已排除 ${(10000 - c.length).toLocaleString()} ${g.guesses.length ? '· <button class="small-button" data-action="undo">撤销上一步</button>' : ''}</p>`) : `<h2 class="main-title">${g.status === 'won' ? '漂亮，密码已破解。' : '这次还差一点。'}</h2><p class="sub">${g.status === 'won' ? '每一条线索，都让答案更近一步。' : '每一次尝试都是下一次推理的线索。'}</p>${digits(g.secret || '????', 'secret')}<div class="controls"><button class="primary" data-action="again">再来一局 →</button><button class="secondary" data-action="home">返回首页</button></div><div class="divider"></div><div class="results"><strong>案件复盘</strong><br>共进行了 ${g.guesses.length} 次猜测，用时 ${time(elapsed(g))}。${g.guesses.length ? `首轮命中 ${g.guesses[0].matches} 位；结合每轮位置命中数，逐步排除不符合条件的数字。` : ''}${g.usedAssist ? ' 本局使用了推理助手。' : ' 本局没有使用推理助手。'}</div>`}${notice ? `<p class="error" role="alert">${esc(notice)}</p>` : ''}<div class="divider"></div><div class="meta"><div><span class="label">猜测次数</span><strong>${String(g.guesses.length).padStart(2, '0')}${limit ? ` <small class="muted">/ ${limit}</small>` : ''}</strong></div><div><span class="label">用时</span><strong id="timer">${time(elapsed(g))}</strong></div></div></section><aside class="card side-card"><div class="card-top"><h2 class="side-heading">线索记录</h2><span class="count">${String(g.guesses.length).padStart(2, '0')} ENTRIES</span></div>${history(g)}${assistant(g)}<div class="divider"></div><div class="card-top"><span class="label">CASE NOTES / 记录你的推理</span>${playing ? `<button class="link" data-action="abort">中止本局 ↗</button>` : ''}</div><textarea id="notes" placeholder="在这里记下你的发现…" style="width:100%;min-height:75px;background:transparent;color:inherit;border:0;resize:vertical;margin-top:12px;outline:none;font:inherit">${esc(g.notes || '')}</textarea></aside></div>`;
+  return `<div class="grid"><section class="card main-card"><div class="card-top"><span class="label">CASE FILE &nbsp; / &nbsp; ${g.mode === 'player' ? '我来猜' : '电脑来猜'}</span><span class="tag">${playing ? '● 调查进行中' : g.status === 'won' ? '✓ 案件已破解' : g.status === 'lost' ? '案件未破解' : '已中止'}</span></div>${playing ? (g.mode === 'player' ? `<h2 class="main-title">输入你的猜测</h2><p class="sub">观察每条线索，找出隐藏的四位密码。</p><div class="input-wrap"><input class="digit-input" id="guess" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" autocorrect="off" spellcheck="false" maxlength="4" value="${esc(input)}" placeholder="输入四位数字" aria-label="输入四位猜测数字"></div><div class="controls"><button class="primary" data-action="submit">提交猜测 &nbsp; →</button></div><p class="tip">输入四位数字，按 Enter 提交。数字可以重复。</p>` : `<h2 class="main-title">电脑的第 ${g.guesses.length + 1} 次猜测</h2><p class="sub">对照心中的数字，有几个位置完全正确？</p>${digits(g.current || '', 'secret')}<div class="feedback">${[0, 1, 2, 3, 4].map(n => `<button class="option" data-feedback="${n}" ${busy ? 'disabled' : ''}>${n}</button>`).join('')}</div><p class="tip">${busy ? '正在计算下一步，请稍候…' : '请选择位置命中数，数字相同但位置不同不计入。'}</p><p class="tip">剩余候选 ${c.length.toLocaleString()} · 已排除 ${(10000 - c.length).toLocaleString()} ${g.guesses.length ? '· <button class="small-button" data-action="undo">撤销上一步</button>' : ''}</p>`) : `<h2 class="main-title">${g.status === 'won' ? '漂亮，密码已破解。' : '这次还差一点。'}</h2><p class="sub">${g.status === 'won' ? '每一条线索，都让答案更近一步。' : '每一次尝试都是下一次推理的线索。'}</p>${digits(g.secret || '????', 'secret')}<div class="controls"><button class="primary" data-action="again">再来一局 →</button><button class="secondary" data-action="home">返回首页</button></div><div class="divider"></div><div class="results"><strong>案件复盘</strong><br>共进行了 ${g.guesses.length} 次猜测，用时 ${time(elapsed(g))}。${g.guesses.length ? `首轮命中 ${g.guesses[0].matches} 位；结合每轮位置命中数，逐步排除不符合条件的数字。` : ''}${g.usedAssist ? ' 本局使用了推理助手。' : ' 本局没有使用推理助手。'}</div>`}${notice ? `<p class="error" role="alert">${esc(notice)}</p>` : ''}<div class="divider"></div><div class="meta"><div><span class="label">猜测次数</span><strong>${String(g.guesses.length).padStart(2, '0')}${limit ? ` <small class="muted">/ ${limit}</small>` : ''}</strong></div><div><span class="label">用时</span><strong id="timer">${time(elapsed(g))}</strong></div></div></section><aside class="card side-card"><div class="card-top"><h2 class="side-heading">线索记录</h2><span class="count">${String(g.guesses.length).padStart(2, '0')} ENTRIES</span></div>${history(g)}${assistant(g)}<div class="divider"></div><div class="card-top"><span class="label">CASE NOTES / 记录你的推理</span>${playing ? `<button class="link" data-action="abort">中止本局 ↗</button>` : ''}</div><textarea id="notes" placeholder="在这里记下你的发现…" style="width:100%;min-height:75px;background:transparent;color:inherit;border:0;resize:vertical;margin-top:12px;outline:none;font:inherit">${esc(g.notes || '')}</textarea></aside></div>`;
 }
 function render() {
   document.body.classList.toggle('light', data.settings.theme === 'light');
@@ -218,27 +218,12 @@ function showStats(mode) {
   $('#record-body').innerHTML =
     `<div class="stats"><div class="stat">总局数<b>${rows.length}</b></div><div class="stat">胜率<b>${rows.length ? Math.round((wins.length / rows.length) * 100) + '%' : '—'}</b></div><div class="stat">胜利局数<b>${wins.length}</b></div><div class="stat">最少次数<b>${wins.length ? Math.min(...wins.map(x => x.guesses.length)) : '—'}</b></div><div class="stat">平均次数（胜局）<b>${avg}</b></div><div class="stat">最快通关<b>${wins.length ? time(Math.min(...wins.map(elapsed))) : '—'}</b></div></div><div class="scroll">${rows.length ? rows.map(x => `<details><summary>${new Date(x.endedAt).toLocaleString()} · ${x.status === 'won' ? '胜利' : x.status === 'lost' ? '失败' : '中止'} · ${x.guesses.length} 次 · ${time(elapsed(x))}</summary><p>谜底：${x.status === 'aborted' ? '未公开' : esc(x.secret || '未公开')} · ${x.usedAssist ? '使用辅助' : '未使用辅助'}</p>${x.guesses.map((h, i) => `<div>${i + 1}. ${h.guess} — ${h.matches} / 4</div>`).join('')}</details>`).join('') : '<p class="muted">还没有记录，开始第一场游戏吧。</p>'}</div>`;
 }
-function updateGuessInput(field, composing = false) {
-  const raw = field.value;
-  input = raw.replace(/\D/g, '').slice(0, 4);
-  if (!composing && raw !== input) {
-    const start = field.selectionStart ?? raw.length;
-    const end = field.selectionEnd ?? start;
-    const cleanPos = pos => Math.min(raw.slice(0, pos).replace(/\D/g, '').length, 4);
-    field.value = input;
-    field.setSelectionRange(cleanPos(start), cleanPos(end));
-  }
-  $('#input-wrap .digits').outerHTML = digits(input, 'entry');
-}
 app.addEventListener('input', e => {
-  if (e.target.id === 'guess') updateGuessInput(e.target, e.isComposing);
+  if (e.target.id === 'guess') input = e.target.value;
   if (e.target.id === 'notes') {
     game.notes = e.target.value;
     save();
   }
-});
-app.addEventListener('compositionend', e => {
-  if (e.target.id === 'guess') updateGuessInput(e.target);
 });
 app.addEventListener('change', e => {
   if (e.target.id === 'assist') {
@@ -254,10 +239,6 @@ app.addEventListener('keydown', e => {
 app.addEventListener('click', e => {
   let t = e.target.closest('button,[data-edit],#input-wrap');
   if (!t) return;
-  if (t.id === 'input-wrap') {
-    $('#guess').focus();
-    return;
-  }
   if (t.dataset.close !== undefined) {
     $('#dialog').close();
     return;
