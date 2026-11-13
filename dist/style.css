@@ -493,3 +493,11 @@ dialog::backdrop {
   color: var(--accent);
   font-weight: 700;
 }
+
+/* Use the native text input directly for mobile keyboards. */
+.input-wrap { margin: 30px 0 22px; }
+.digit-input { position: static; display: block; opacity: 1; width: min(100%, 342px); height: 88px; border: 1px solid #596454; border-radius: 3px; background: #141a15; color: #e9ebe2; padding: 0 20px; font: 500 38px ui-monospace, monospace; letter-spacing: .18em; outline: none; }
+.digit-input:focus { border-color: var(--accent); box-shadow: inset 0 -2px var(--accent); }
+.digit-input::placeholder { font: 14px Inter, "Microsoft YaHei", sans-serif; letter-spacing: 0; color: var(--muted); }
+.light .digit-input { background: #f4f6ef; color: #202a21; }
+@media (max-width: 750px) { .digit-input { height: 76px; } }
