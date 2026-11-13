@@ -501,3 +501,11 @@ dialog::backdrop {
 .digit-input::placeholder { font: 14px Inter, "Microsoft YaHei", sans-serif; letter-spacing: 0; color: var(--muted); }
 .light .digit-input { background: #f4f6ef; color: #202a21; }
 @media (max-width: 750px) { .digit-input { height: 76px; } }
+
+/* The native input stays in place while the cells mirror its value. */
+.input-wrap { position: relative; width: max-content; max-width: 100%; }
+.input-digits { margin: 0; pointer-events: none; }
+.input-wrap .digit-input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 1; border: 0; background: transparent; color: transparent; caret-color: transparent; -webkit-text-fill-color: transparent; box-shadow: none; padding: 0; }
+.input-wrap .digit-input:focus { border: 0; box-shadow: none; }
+.input-wrap:focus-within .input-digits .digit { border-color: #879775; }
+.input-wrap .digit-input::selection { background: transparent; }
